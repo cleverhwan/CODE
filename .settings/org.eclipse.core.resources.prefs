@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+encoding//WebContent/WEB-INF/spring/database.properties=UTF-8
+encoding//resource/messages.properties=UTF-8
+encoding//resource/mtc.properties=UTF-8
+encoding//src/kr/co/code/biz/common/filter/CacheFilter.java=UTF-8
+encoding//src/kr/co/code/biz/common/filter/XssFilter.java=UTF-8

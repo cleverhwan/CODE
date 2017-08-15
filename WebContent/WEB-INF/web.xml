@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+	<display-name>MTC_SERVER_CLIENT</display-name>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>*.do</url-pattern>
+		<url-pattern>/en</url-pattern>
+		<url-pattern>/zh</url-pattern>
+	</servlet-mapping>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<listener> 
+    <listener-class> 
+        org.springframework.web.context.request.RequestContextListener 
+    </listener-class> 
+	</listener> 
+		
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>
+			/WEB-INF/spring/app-config.xml
+			/WEB-INF/spring/cache-config.xml
+			/WEB-INF/spring/multipart-config.xml
+			/WEB-INF/spring/quartz-config.xml
+			/WEB-INF/spring/security-context.xml
+		</param-value>
+	</context-param>
+	
+	<!-- resource-ref>
+		<res-ref-name>jdbc/mtcds</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref -->
+
+	<filter>
+		<filter-name>XSS</filter-name>    
+		<filter-class>kr.co.code.biz.common.filter.XssFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>XSS</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping> 	
+	<filter>
+		<filter-name>CACHE</filter-name>    
+		<filter-class>kr.co.code.biz.common.filter.CacheFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>CACHE</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>	
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+	    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+    <filter-name>springSecurityFilterChain</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
+	<listener>
+		<listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+	</listener>
+	<session-config>
+    	<session-timeout>240</session-timeout>
+  	</session-config>
+	<error-page>
+		<error-code>400</error-code>
+		<location>/jsp/error/500.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>401</error-code>
+		<location>/jsp/error/500.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>403</error-code>
+		<location>/jsp/error/500.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>404</error-code>
+		<location>/jsp/error/404.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>405</error-code>
+		<location>/jsp/error/500.jsp</location>
+	</error-page>
+	<error-page>
+		<error-code>500</error-code>
+		<location>/jsp/error/500.jsp</location>
+	</error-page>
+	<error-page>
+		<exception-type>java.lang.Exception</exception-type>
+		<location>/jsp/error/defaultError.jsp</location>
+	</error-page>
+	<error-page>
+		<exception-type>java.lang.Throwable</exception-type>
+		<location>/jsp/error/defaultError.jsp</location>
+	</error-page>
+</web-app>

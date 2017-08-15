@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+     <context:property-placeholder location="classpath:system.properties"/>
+
+    <!-- system.properties DB -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="${database.driver}"></property>
+        <property name="url" value="${database.url}"></property>
+        <property name="username" value="${database.user}"></property>
+        <property name="password" value="${database.password}"></property>
+		<property name="validationQuery" value="${database.validationQuery}"/>
+		<property name="testWhileIdle" value="true"/>
+		<property name="timeBetweenEvictionRunsMillis" value="7200000"/>
+    </bean>
+
+	<!-- jndi DB -->
+	<!-- 
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName" value="jdbc/mtestfrtDS" />
+	</bean>
+	-->
+
+	<!-- Email Server 설정 -->
+	<bean id="mailSender" class ="org.springframework.mail.javamail.JavaMailSenderImpl" > 
+		    <property name="host" value="mail.onycom.com" />
+		    <property name="port" value="587" />
+		    <property name="username" value="ipod@onycom.com" />
+		    <property name="password" value="onycom.com!!" />
+		    <property name="javaMailProperties">
+			    <props>
+	                <prop key="mail.transport.protocol">smtp</prop>
+		            <prop key="mail.smtp.auth">true</prop>
+		            <prop key="mail.smtp.starttls.enable">true</prop>
+		            <prop key="mail.debug">true</prop>
+			    </props>
+		</property>
+	</bean>
+	<!-- 
+	<bean id="mailSender" class ="org.springframework.mail.javamail.JavaMailSenderImpl" > 
+	    <property name="javaMailProperties">
+	    <props>
+            <prop key="mail.smtp.auth">false</prop>
+            <prop key="mail.smtp.starttls.enable">false</prop>
+            <prop key="mail.smtp.debug">false</prop>
+            <prop key="mail.smtp.host">203.235.210.110</prop>
+            <prop key="mail.smtp.port">25</prop>
+	    </props>
+	    </property>
+	</bean>
+	-->
+
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:messages</value>
+				<value>classpath:system</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="utf-8" />
+	</bean>
+
+	<bean id="messageSourceAccessor" class="org.springframework.context.support.MessageSourceAccessor">
+		<constructor-arg ref="messageSource"/>
+	</bean>
+
+	<bean id="message" class="kr.co.code.common.message.CodeMessageHandler">
+		<property name="messageSourceAccessor" ref="messageSourceAccessor"/>
+	</bean>
+
+	<bean id="property" class="kr.co.code.common.message.CodePropertyHandler">
+		<property name="messageSourceAccessor" ref="propertySourceAccessor"/>
+	</bean>
+
+	<bean id="propertySource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>classpath:system</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="utf-8" />
+	</bean>
+
+	<bean id="propertySourceAccessor" class="org.springframework.context.support.MessageSourceAccessor">
+		<constructor-arg ref="propertySource"/>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="dataSource" />
+
+		<bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean"
+		p:configLocation="classpath:${database.type}-sqlmap-config.xml" p:dataSource-ref="dataSource" />
+		<bean id="sqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate"
+		p:sqlMapClient-ref="sqlMapClient"/>
+
+	<bean id="exceptionResolver" class="kr.co.code.biz.common.util.BaseExceptionResolver">
+		<property name="errorView" value="/error/defaultError"/>
+		<property name="accessDeniedView" value="/error/accessDenied"/>
+	</bean>
+
+</beans>

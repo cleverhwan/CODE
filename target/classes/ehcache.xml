@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache  
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+	xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"  
+	maxBytesLocalHeap="32M" 
+	maxBytesLocalOffHeap="128M"  
+	maxBytesLocalDisk="0M" 
+	updateCheck="false">          
+	
+<!-- 	<cache     -->
+<!-- 		name="linkSysIfCache"          -->
+<!-- 			maxElementsInMemory="100"          -->
+<!-- 			eternal="false"          -->
+<!-- 			overflowToDisk="false" /> -->
+			
+<!-- 	<cache     -->
+<!-- 		name="categoryCache"          -->
+<!-- 			maxElementsInMemory="100"          -->
+<!-- 			eternal="false"          -->
+<!-- 			overflowToDisk="false" /> -->
+	<cache
+		name="CommCodeCache"
+			maxElementsInMemory="500"
+			eternal="false"
+			overflowToDisk="false" />
+	<cache
+		name="MessageCache"
+			maxElementsInMemory="500"
+			eternal="false"
+			overflowToDisk="false" />	
+	<cache
+		name="AdminMenuCache"
+			maxElementsInMemory="500"
+			eternal="false"
+			overflowToDisk="false" />
+
+<!-- 	<cache -->
+<!-- 		name="StplCache" -->
+<!-- 			maxElementsInMemory="10" -->
+<!-- 			eternal="false" -->
+<!-- 			overflowToDisk="false" />							 -->
+<!-- 	<cache -->
+<!-- 		name="NoticeCache" -->
+<!-- 			maxElementsInMemory="500" -->
+<!-- 			eternal="false" -->
+<!-- 			overflowToDisk="false" /> -->
+<!-- 	<cache -->
+<!-- 		name="MissionRuleCache" -->
+<!-- 			maxElementsInMemory="500" -->
+<!-- 			eternal="false" -->
+<!-- 			overflowToDisk="false" /> -->
+
+<!-- 	<cache -->
+<!-- 		name="MainNoticeCache" -->
+<!-- 			maxElementsInMemory="10" -->
+<!-- 			eternal="false" -->
+<!-- 			overflowToDisk="false" /> -->
+<!-- 	<cache -->
+<!-- 		name="TotalPointCache" -->
+<!-- 			maxElementsInMemory="10" -->
+<!-- 			eternal="false" -->
+<!-- 			overflowToDisk="false" -->
+<!-- 			timeToLiveSeconds="300"/> -->
+<!-- 	<cache -->
+<!-- 		name="PmsCheckerCache" -->
+<!-- 			maxElementsInMemory="10" -->
+<!-- 			eternal="false" -->
+<!-- 			overflowToDisk="false" /> -->
+</ehcache>

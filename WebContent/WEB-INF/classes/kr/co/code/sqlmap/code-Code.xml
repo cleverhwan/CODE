@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="code">
+	<typeAlias alias="dataMap" type="kr.co.code.common.util.DataMap"/>
+	
+	<cacheModel id="cacheCommCode" readOnly="false" serialize="true" type="LRU">
+		<flushInterval hours="12" />
+		<!-- <flushOnExecute statement ="select" /> -->
+		<property name="size" value="1000" />
+	</cacheModel>
+	
+	<select id="getCommonCodeList" cacheModel="cacheCommCode" parameterClass="java.util.Map" resultClass="dataMap">
+		/* code.getCommonCodeList :: mtc_comm_cd*/
+		select
+			a.code
+			,a.value
+			,a.code_desc
+			,a.par_code
+			,a.type
+		from mtest.mtc_comm_cd a
+		where  a.type = #type#
+		<isNotEmpty property="code">
+		and a.code = #code#
+		</isNotEmpty>
+		and a.use_yn='Y'
+		order by a.seq
+	</select>
+
+	<!-- 회원정보 데이터 가져오기. -->
+	<select id="getMemberSelectList" parameterClass="java.util.Map" resultClass="dataMap">
+		/* code.getMemberSelectList :: mtest.mtc_cust_mst*/
+		select
+			 a.cust_id
+			,a.login_id
+			,a.cust_nm
+			,a.position
+			,a.company_cd
+			,(select co.value from mtest.mtc_comm_cd co where co.type='QC_COMPANY_GROUP' and co.code=a.company_cd) company_nm
+			,a.job
+			,a.comment
+			,a.hp_num
+			,a.email
+			,a.password
+			,a.cust_st
+			,a.cust_tp
+			,a.start_dt
+			,a.end_dt
+			,a.reg_dt
+			,a.modify_dt
+			,a.region
+			,a.nation
+			,a.note
+			,a.auth_cd
+			,a.job_cd
+			,a.nouse_send_yn
+			,a.job_num
+			,a.nick_nm
+			,a.dev_init_yn
+			,a.dev_cfg_yn
+			,a.business_num
+			,a.company_nm
+			,a.rep_nm
+			,a.member_cd
+			,a.agree_date
+			,a.reg_tp
+			,a.license_file_id
+			,a.buy_num_in_use
+			,a.buy_seq_in_use
+			,a.demo_cust_tp
+			,a.lang_tp
+			,a.fsys_tp
+			<isNotEmpty property="paramRoleCode">
+			,b.role_code
+			</isNotEmpty>
+		from mtest.mtc_cust_mst a
+		<isNotEmpty property="paramRoleCode">
+		,mtest.mtc_cust_mst_by_role b
+		</isNotEmpty>
+		<dynamic prepend="where">
+			<isNotEmpty property="paramRoleCode" prepend="and">
+			a.cust_id = b.cust_id	
+			</isNotEmpty>
+			<isNotEmpty property="paramRoleCode" prepend="and">
+			b.role_code = #paramRoleCode#
+			</isNotEmpty>
+			<isNotEmpty property="searchMemberCompanyCode"  prepend="and">
+			a.company_cd = #searchMemberCompanyCode#
+			</isNotEmpty>
+			<isNotEmpty property="searchMemberName"  prepend="and">
+			a.cust_nm like concat('%',#searchMemberName#,'%')
+			</isNotEmpty>
+		</dynamic>	
+		order by a.cust_nm
+	</select>
+	
+	
+	<!-- 사용자 롤 정보 가져오기. -->
+	<select id="getUserRole" parameterClass="java.util.Map" resultClass="dataMap">
+		select	role_code
+		from		mtc_cust_mst_by_role
+		where	cust_id = #cust_id#
+	</select>
+
+	<!-- 프로젝트 정보 가져오기. -->
+	<select id="getProjectList" parameterClass="java.util.Map" resultClass="dataMap">
+		select	a.req_project_id, a.test_project_id, a.project_name, date_format( a.regist_req_dttm, '%Y-%m-%d %H:%i:%s' ) as regist_dttm
+		from		mtest.qc_project_info a
+		<isNotEmpty property="paramTesterId">
+		,(
+			select distinct project_id from qc_test_number_tester_by_scenario_info where tester_id = #paramTesterId#
+		) b
+		</isNotEmpty>
+		where	a.del_yn = 'N'
+			and	a.company_code = #company_code#
+			and	a.status_code = #status_code#
+		<isNotEmpty property="paramTesterId">	
+			and   a.test_project_id = b.project_id
+		</isNotEmpty>
+		order by	a.regist_req_dttm desc
+	</select>
+
+	<!-- 테스트 차수 정보 가져오기. -->
+	<select id="getTestNumberList" parameterClass="java.util.Map" resultClass="dataMap">
+		select	project_id, test_number_id, test_number_name, 
+					date_format( start_dt, '%Y-%m-%d' ) as start_dt, 
+					date_format( end_dt, '%Y-%m-%d' ) as end_dt
+		from		mtest.qc_test_number_info
+		where	del_yn = 'N'
+			and	project_id = #project_id#
+			and	status_code = #status_code#
+		order by	regist_req_dttm desc
+	</select>
+
+	<!-- 이전 테스트 차수 정보 가져오기. -->
+	<select id="getPrevTestNumberList" parameterClass="java.util.Map" resultClass="dataMap">
+		select	project_id, test_number_id, test_number_name
+		from		mtest.qc_test_number_info
+		where	project_id = #project_id#
+			and	start_dt &lt; (	select	start_dt
+										from		mtest.qc_test_number_info
+										where	project_id = #project_id#
+											and	test_number_id = #test_number_id#
+									)
+		order by	regist_req_dttm desc
+	</select>
+</sqlMap>

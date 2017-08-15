@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+						http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.0.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+    <context:property-placeholder location="classpath:system.properties"/>
+	<context:component-scan base-package="kr.co.code.*" />
+		
+	<http lowercase-comparisons="false" use-expressions="true" disable-url-rewriting="true" entry-point-ref="loginUrlAuthenticationEntryPoint">		
+	    <anonymous/>	    
+	    <logout logout-url="/logout/logout.do" success-handler-ref="logoutSuccessHandler" invalidate-session="false" />		
+		<session-management>
+			<concurrency-control max-sessions="1" expired-url="/cmn/loginInfo.do" error-if-maximum-exceeded="false"/>
+		</session-management>
+		<access-denied-handler ref="accessDeniedHandler" />		
+		<custom-filter position="FORM_LOGIN_FILTER" ref="usernamePasswordAuthenticationFilter" />
+		
+    	<intercept-url pattern="/common/**" filters="none" />
+    	<intercept-url pattern="/index.html" filters="none" />
+		<intercept-url pattern="/sec/**"/>
+		<intercept-url pattern="/login/**"/>
+		<intercept-url pattern="/home/**"/>
+    	<intercept-url pattern="/sec/svc/**" access="isAuthenticated()" />
+    	<intercept-url pattern="/myInfo/**" access="isAuthenticated()" />
+    	<intercept-url pattern="/withdraw/**" access="isAuthenticated()" />
+		<intercept-url pattern="/qc/defect/AddDefect.do" access="isAuthenticated()" />
+		<intercept-url pattern="/cmn/**" requires-channel="any"/>
+		<intercept-url pattern="/**/*.do" />
+		<intercept-url pattern="/*.do" />
+		<intercept-url pattern="/**" access="permitAll" /><!-- 인증 불필수 화면 -->		
+	</http>
+    
+<!-- 로그아웃 HANDLER-->  
+	<beans:bean id="logoutSuccessHandler" class="kr.co.code.biz.common.security.handler.CodeLogoutSuccessHandler" />
+	
+<!-- secutiry 체크 후 권한이 없을 경우 권한에러 페이지로 이동 -->
+	<beans:bean id="accessDeniedHandler" class="kr.co.code.biz.common.security.handler.CodeAccessDeniedHandler">
+ 		<beans:property name="accessDeniedPage" value="/error/accessDenied.do" />
+ 	</beans:bean>
+		
+<!-- 로그인 HANDLER-->
+    <beans:bean id="loginUrlAuthenticationEntryPoint" class="kr.co.code.biz.common.security.handler.CodeLoginUrlAuthenticationEntryPoint" />	
+    
+<!-- usernamePasswordAuthenticationFilter 관련 beans 시작 -->
+    <beans:bean id="usernamePasswordAuthenticationFilter" class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+        <beans:property name="authenticationManager" ref="authenticationManager" />
+        <beans:property name="authenticationFailureHandler" ref="failureHandler" />
+        <beans:property name="authenticationSuccessHandler" ref="successHandler" />
+        <beans:property name="filterProcessesUrl" value="/login/loginSuccess.do" />
+        <beans:property name="postOnly" value="false" />
+    </beans:bean>
+         	
+  	<!-- 유저정보를 DB에서 가져오게 설정하고 UserDetails를 상속받은 SBnfUserDetailsService를 구현-->
+	<authentication-manager alias="authenticationManager">
+	  <authentication-provider user-service-ref="userDetailsService">
+	  </authentication-provider>
+	</authentication-manager>
+	
+	<!-- 인증 후 처리 : PC 인증 후 원래 페이지 유지하기 위해서 Customizing-->
+    <beans:bean id="successHandler" class="kr.co.code.biz.common.security.handler.CodeAuthenticationSuccessHandler">
+    </beans:bean>
+
+	<!-- 인증 실패시 이동 페이지-->
+    <beans:bean id="failureHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+        <beans:property name="defaultFailureUrl" value="/login/loginForm.do?error" />
+    </beans:bean>
+<!-- usernamePasswordAuthenticationFilter 관련 beans 종료 -->
+</beans:beans>
